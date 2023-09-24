@@ -144,7 +144,7 @@ if start:
             i += 1
             st.title(f"{i}. Visualization")
             try:
-                st.pyplot(attributions.plot(model_type=model_type))
+                st.pyplot(attributions.plot(model_type=model_type).figure)
             except UnboundLocalError:
                 st.warning("Please Select a Model For Visualization")
 
