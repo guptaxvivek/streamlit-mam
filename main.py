@@ -3,9 +3,19 @@ from marketing_attribution_models import MAM
 import pandas as pd
 from matplotlib import pyplot as plt
 import seaborn as sns
+import plotly.express as px
 
 df = None
 attributions = None
+c = []
+c[0:2] = st.columns(2)
+c[2:4] = st.columns(2)
+c[4:6] = st.columns(2)
+c[6:8] = st.columns(2)
+c[8:10] = st.columns(2)
+
+
+
 with st.sidebar:
     st.title("Marketing Attribution Model")
     with st.expander('Dataset'):
@@ -51,14 +61,14 @@ with st.sidebar:
 
         with st.expander('Position based Model'):
             pos_model = st.toggle("Show Position Based Model")
-            if pos_model:
+            if pos_model and csv_file:
                 first_weight = st.slider("First Weight", 0, 100)/100
                 middle_weight = st.slider("Middle Weight", 0, 100)/100
                 last_weight = st.slider("Last Weight", 0, 100)/100
 
         with st.expander('Time Decay Model'):
             decay_model = st.toggle("Show Time Decay Model")
-            if decay_model:
+            if decay_model and csv_file:
                 decay_ot = st.slider("Decay Over Time", 0, 100, 50)/100
                 frq = st.slider("Frequency", 1, 10)
 
@@ -69,7 +79,7 @@ with st.sidebar:
 
         with st.expander('Shapely Value'):
             shapely = st.toggle("Show Shapely Value")
-            if shapely:
+            if shapely and csv_file:
                 values_col = st.selectbox("Values Column", attributions.as_pd_dataframe().columns)
 
         with st.expander("Visualizations"):
@@ -81,95 +91,112 @@ start = st.checkbox('Start Model')
 if start:
     if attributions:
         i = 1
-        st.title(f"{i}. Dataframe")
-        st.dataframe(attributions.as_pd_dataframe())
+        with c[i-1]:
+            st.title(f"{i}. Dataframe")
+            st.dataframe(attributions.as_pd_dataframe(), use_container_width=True)
 
         if grp_by_channel:
             i += 1
-            st.title(f"{i}. Group By Channel")
-            attributions.attribution_shapley()
-            df = attributions.group_by_channels_models
-            fig, ax = plt.subplots()
-            ax.pie(df[df.columns[1]], labels=df.channels, autopct='%.0f%%')
-            st.pyplot(fig)
-            st.write("You can see all results grouped by channel.")
+            with c[i-1]:
+                st.title(f"{i}. Group By Channel")
+                attributions.attribution_shapley()
+                df = attributions.group_by_channels_models
+                fig = px.pie(df, values=df.columns[1], names=df.columns[0])
+                st.plotly_chart(fig, use_container_width=True)
+                st.write("You can see all results grouped by channel.")
 
         if last_click:
             i += 1
-            st.title(f"{i}. last Click")
-            attribution_last_click = attributions.attribution_last_click()
-            df = attribution_last_click[1]
-            fig, ax = plt.subplots()
-            ax.pie(df[df.columns[1]], labels=df.channels, autopct='%.0f%%')
-            st.pyplot(fig)
-            st.write("The Last Click heuristic, also known as the Last Touch attribution model, is one of the simplest and most widely used methods in marketing attribution models. This model attributes 100% of the conversion value to the last touchpoint or interaction that the customer had before converting, like making a purchase or filling out a form.")
+            with c[i-1]:
+                st.title(f"{i}. last Click")
+                attribution_last_click = attributions.attribution_last_click()
+                df = attribution_last_click[1]
+                fig = px.pie(df, values=df.columns[1], names=df.columns[0])
+                st.plotly_chart(fig, use_container_width=True)
+                st.write("The Last Click heuristic, also known as the Last Touch attribution model, is one of the simplest and most widely used methods in marketing attribution models. This model attributes 100% of the conversion value to the last touchpoint or interaction that the customer had before converting, like making a purchase or filling out a form.")
 
         if first_click:
             i += 1
-            st.title(f"{i}. First Click")
-            attribution_first_click = attributions.attribution_first_click()
-            df = attribution_first_click[1]
-            fig, ax = plt.subplots()
-            ax.pie(df[df.columns[1]], labels=df.channels, autopct='%.0f%%')
-            st.pyplot(fig)
-            st.write("The First Click model, sometimes also known as the First Touch model, is a heuristic (or rule of thumb) that attributes 100% of the conversion value to the first interaction or touchpoint a customer has with a brand or campaign. This means that if a conversion occurs, the entire credit for that conversion is given to the first channel through which the user engaged with the brand.")
+            with c[i-1]:
+                st.title(f"{i}. First Click")
+                attribution_first_click = attributions.attribution_first_click()
+                df = attribution_first_click[1]
+                fig = px.pie(df, values=df.columns[1], names=df.columns[0])
+                st.plotly_chart(fig, use_container_width=True)
+                st.write("The First Click model, sometimes also known as the First Touch model, is a heuristic (or rule of thumb) that attributes 100% of the conversion value to the first interaction or touchpoint a customer has with a brand or campaign. This means that if a conversion occurs, the entire credit for that conversion is given to the first channel through which the user engaged with the brand.")
 
         if last_click_non:
             i += 1
-            st.title(f"{i}. Last Click Non Direct Model")
-            data = attributions.attribution_last_click_non(but_not_this_channel='Direct')[1]
-            fig, ax = plt.subplots(figsize=(15,10))
-            ax.bar(data.channels, data[data.columns[1]])
-            st.pyplot(fig)
-            st.write("In this, Direct traffic is overwritten in case previous interations have a specific traffic source other than Direct itself in a given timespan (6 months by default).")
+            with c[i-1]:
+                st.title(f"{i}. Last Click Non Direct Model")
+                data = attributions.attribution_last_click_non(but_not_this_channel='Direct')[1]
+                fig = px.bar(data, x='channels', y=data.columns[1])
+                st.plotly_chart(fig, use_container_width=True)
+                st.write("In this, Direct traffic is overwritten in case previous interations have a specific traffic source other than Direct itself in a given timespan (6 months by default).")
         if pos_model:
             i += 1
-            st.title(f"{i}. Position Based Model")
-            df = attributions.attribution_position_based(
-                list_positions_first_middle_last=[first_weight, middle_weight, last_weight])[1]
-            fig, ax = plt.subplots(figsize=(15, 10))
-            ax.bar(df.channels, df[df.columns[1]], color='red')
-            st.pyplot(fig)
-            st.write("This model inputs the weights respective to the positions of channels in each journey can me specified according to business related decisions")
+            with c[i-1]:
+                st.title(f"{i}. Position Based Model")
+                if csv_file:
+                    df = attributions.attribution_position_based(
+                        list_positions_first_middle_last=[first_weight, middle_weight, last_weight])[1]
+                else:
+                    df = attributions.attribution_position_based(
+                        list_positions_first_middle_last=[0.3, 0.3, 0.4])[1]
+                try:
+                    fig = px.bar(x=df.channels, y=df.columns[1])
+                except AttributeError:
+                    fig = px.bar(x=df.index, y=df.values)
+                st.plotly_chart(fig, use_container_width=True)
+                # st.write("This model inputs the weights respective to the positions of channels in each journey can me specified according to business related decisions")
 
 
         if decay_model:
             i += 1
-            st.title(f"{i}. Time Decay Model")
-            df = attributions.attribution_time_decay(decay_over_time=decay_ot, frequency=frq)[1]
-            fig, ax = plt.subplots()
-            ax.pie(df[df.columns[1]], labels=df.channels, autopct='%.0f%%')
-            st.pyplot(fig)
-            st.write("The Time Decay model in marketing attribution is a way to assign credit to the different interactions, or touchpoints, a customer has with your marketing channels before they make a purchase or conversion. In this model, the interactions that occur closer to the time of conversion receive more credit than those that occur further away in time. Essentially, the credit decays as you go back in time from the conversion.")
+            with c[i-1]:
+                st.title(f"{i}. Time Decay Model")
+                if csv_file:
+                    df = attributions.attribution_time_decay(decay_over_time=decay_ot, frequency=frq)[1]
+                else:
+                    df = attributions.attribution_time_decay(
+                        decay_over_time=0.6,
+                        frequency=7)[1]
+                fig = px.pie(df, values=df.columns[1], names=df.channels)
+                st.plotly_chart(fig, use_container_width=True)
+                st.write("The Time Decay model in marketing attribution is a way to assign credit to the different interactions, or touchpoints, a customer has with your marketing channels before they make a purchase or conversion. In this model, the interactions that occur closer to the time of conversion receive more credit than those that occur further away in time. Essentially, the credit decays as you go back in time from the conversion.")
 
         if markov:
             i += 1
-            st.title(f"{i}. Attribution Using Markov")
-            attribution_markov = attributions.attribution_markov(transition_to_same_state=False)
-            ax, fig = plt.subplots(figsize=(15, 10))
-            sns.heatmap(attribution_markov[2].round(3), cmap="YlGnBu", annot=True, linewidths=.5)
-            st.pyplot(ax)
-            if removal_effect:
-                i += 1
-                st.header(f"{i}. Removal Effect")
-                ax1, fig1 = plt.subplots(figsize=(2, 5))
-                sns.heatmap(attribution_markov[3].round(3), cmap="YlGnBu", annot=True, linewidths=.5)
-                st.pyplot(ax1)
-            st.write("Markov Chains in marketing attribution models provide a sophisticated approach to understanding and allocating credit to different marketing channels involved in customer conversion paths. A Markov Chain is a statistical model that calculates the probability of transitioning from one state to another within a system.")
+            with c[i-1]:
+                st.title(f"{i}. Attribution Using Markov")
+                attribution_markov = attributions.attribution_markov(transition_to_same_state=False)
+                # ax, fig = plt.subplots(figsize=(15, 10))
+                fig = px.imshow(attribution_markov[2].round(3), text_auto=True)
+                st.plotly_chart(fig, use_container_width=True)
+                if removal_effect:
+                    st.header("Removal Effect")
+                    fig1 = px.imshow(attribution_markov[3].round(3), text_auto=True)
+                    st.plotly_chart(fig1, use_container_width=True)
+                st.write("Markov Chains in marketing attribution models provide a sophisticated approach to understanding and allocating credit to different marketing channels involved in customer conversion paths. A Markov Chain is a statistical model that calculates the probability of transitioning from one state to another within a system.")
 
         if shapely:
             i += 1
-            st.title(f"{i}. Shapely Value")
-            st.dataframe(attributions.attribution_shapley(size=4, order=True, values_col=values_col)[0])
-            st.write("The Shapley Value is a concept from cooperative game theory that has been applied to marketing attribution models to distribute the credit for a conversion among different marketing channels. It allows for a fair allocation of the conversion value to each touchpoint in the customer journey, based on their contribution to the conversion.")
+            with c[i-1]:
+                st.title(f"{i}. Shapely Value")
+                if csv_file:
+                    st.dataframe(attributions.attribution_shapley(size=4, order=True, values_col=values_col)[0])
+                else:
+                    st.dataframe(attributions.attribution_shapley(size=4, order=True, values_col="conversions")[0])
+                st.write("The Shapley Value is a concept from cooperative game theory that has been applied to marketing attribution models to distribute the credit for a conversion among different marketing channels. It allows for a fair allocation of the conversion value to each touchpoint in the customer journey, based on their contribution to the conversion.")
 
         if viz:
             i += 1
-            st.title(f"{i}. Visualization")
-            try:
-                st.pyplot(attributions.plot(model_type=model_type).figure)
-            except UnboundLocalError:
-                st.warning("Please Select a Model For Visualization")
+            with c[i - 1]:
+                st.title(f"{i}. Visualization")
+                try:
+                    st.pyplot(attributions.plot(model_type=model_type).figure)
+                except UnboundLocalError:
+                    st.warning("Please Select a Model For Visualization")
 
     else:
         st.warning("Please Select a Dataframe")
