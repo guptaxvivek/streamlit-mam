@@ -7,6 +7,8 @@ import plotly.express as px
 
 df = None
 attributions = None
+st.set_page_config(layout="wide")
+
 c = []
 c[0:2] = st.columns(2)
 c[2:4] = st.columns(2)
@@ -87,7 +89,38 @@ with st.sidebar:
             if viz:
                 model_type = st.selectbox("Model Type", ['all', 'heuristic', 'algorithmic'])
 
+with(st.expander("🌟 Welcome to the Marketing Attribution Models Interface! 🌟")):
+    st.write("""**🔍 Overview:**\n
+This user-friendly interface is designed to help marketers, analysts, and businesses visualize and understand how different marketing channels contribute to conversions. Whether you're new to marketing analytics or a seasoned professional, this tool makes it easy to see which channels are driving results and where to optimize your marketing spend.
+\n**🛠 Features:**\n
+\n**Multiple Attribution Models:**\n
+Explore various attribution models like First Click, Last Click, Linear, and Time Decay to see how they allocate conversion value to different marketing channels.
+User-Friendly Visualization:
+View your attribution data in intuitive charts and graphs, allowing you to quickly comprehend the impact of each channel on conversions.
+\n**Customizable Insights:**\n
+Tailor the analysis to your needs, adjust settings, and explore different scenarios to see how changes in attribution can impact your marketing strategy.
+\n**🌐 How to Use:**\n
+\n**Input Your Data:**\n
+Start by uploading your marketing data as a csv file, including interactions across different channels and conversions.
+\n**Select Attribution Model:**\n
+Choose the attribution model you want to apply. You can switch between models to compare results.
+\n**Analyze & Optimize:**\n
+Review the visualized results to understand which channels are most effective, and optimize your marketing efforts accordingly.
+\n**📘 Benefits of Using This Tool:**\n
+\n**Informed Decision-Making:**\n
+Gain insights into the effectiveness of your marketing channels, helping you make data-driven decisions to optimize your marketing ROI.
+\n**Efficient Resource Allocation:**\n
+Understand which channels are contributing most to conversions and allocate your marketing resources more effectively.
+\n**Enhanced Marketing Strategy:**\n
+Leverage the insights gained from different attribution models to refine your marketing strategies and campaigns for better outcomes.
+\n**🌟 Start Your Analysis!**\n
+Dive in and explore how different marketing channels are influencing your conversions. If you’re ready to uncover insights and optimize your marketing strategies, this is the tool for you!
+""")
+
+
 start = st.checkbox('Start Model')
+
+
 if start:
     if attributions:
         i = 1
