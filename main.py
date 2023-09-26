@@ -9,15 +9,6 @@ df = None
 attributions = None
 st.set_page_config(layout="wide")
 
-c = []
-c[0:2] = st.columns(2)
-c[2:4] = st.columns(2)
-c[4:6] = st.columns(2)
-c[6:8] = st.columns(2)
-c[8:10] = st.columns(2)
-
-
-
 with st.sidebar:
     st.title("Marketing Attribution Model")
     with st.expander('Dataset'):
@@ -122,6 +113,12 @@ start = st.checkbox('Start Model')
 
 
 if start:
+    c = []
+    c[0:2] = st.columns(2)
+    c[2:4] = st.columns(2)
+    c[4:6] = st.columns(2)
+    c[6:8] = st.columns(2)
+    c[8:10] = st.columns(2)
     if attributions:
         i = 1
         with c[i-1]:
