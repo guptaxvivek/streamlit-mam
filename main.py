@@ -144,7 +144,7 @@ if start:
                     df = attributions.attribution_position_based(
                         list_positions_first_middle_last=[0.3, 0.3, 0.4])[1]
                 try:
-                    fig = px.bar(x=df.channels, y=df.columns[1])
+                    fig = px.bar(x=df.channels, y=df[df.columns[1]])
                 except AttributeError:
                     fig = px.bar(x=df.index, y=df.values)
                 st.plotly_chart(fig, use_container_width=True)
