@@ -114,11 +114,23 @@ start = st.checkbox('Start Model')
 
 if start:
     c = []
-    c[0:2] = st.columns(2)
+    c[0:2] = st.columns(2,gap="medium")
     c[2:4] = st.columns(2)
     c[4:6] = st.columns(2)
     c[6:8] = st.columns(2)
     c[8:10] = st.columns(2)
+
+    st.markdown("""
+        <style type="text/css">
+            div[data-testid="column"] {
+                border: 1px solid black;
+                padding: 10px;
+                border-radius: 5px;
+                box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+            }
+        </style>
+    """, unsafe_allow_html=True)
+
     if attributions:
         i = 1
         with c[i-1]:
