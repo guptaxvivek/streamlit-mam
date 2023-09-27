@@ -115,10 +115,10 @@ start = st.checkbox('Start Model')
 if start:
     c = []
     c[0:2] = st.columns(2,gap="medium")
-    c[2:4] = st.columns(2)
-    c[4:6] = st.columns(2)
-    c[6:8] = st.columns(2)
-    c[8:10] = st.columns(2)
+    c[2:4] = st.columns(2,gap="medium")
+    c[4:6] = st.columns(2,gap="medium")
+    c[6:8] = st.columns(2,gap="medium")
+    c[8:10] = st.columns(2,gap="medium")
 
     st.markdown("""
         <style type="text/css">
